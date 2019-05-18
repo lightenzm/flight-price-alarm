@@ -20,8 +20,6 @@ def sign_up():
         create_user(username, email, apikey)
     except mysql.connector.errors.IntegrityError as e:
         return "user already exists"
-    else:
-        raise
     return str(apikey)
 
 if __name__ == '__main__':
