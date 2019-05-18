@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import boto3
+import mysql.connector
 
 country = "us"
 url = "https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/browsedates/v1.0/" + country + "/usd/en-us/LHR-sky/SFO-sky/2019-09-09/2019-09-10"
