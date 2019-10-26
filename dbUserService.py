@@ -28,8 +28,7 @@ def create_user(username, email, apikey):
     val = (username, email, apikey)
     mycursor.execute(sql, val)
     mydb.commit()
-
-print(mycursor.rowcount, "record inserted.")
+    print(mycursor.rowcount, "record inserted.")
 
 # mycursor = mydb.cursor()
 #

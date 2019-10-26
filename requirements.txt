@@ -2,3 +2,4 @@ boto3==1.9.130
 mysql-connector==2.2.9
 flask
 requests
+hvac
