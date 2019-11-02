@@ -17,10 +17,10 @@ def sign_up():
     email = request.args.get('email')
     apikey = str(uuid.uuid4().fields[-1])[:15]
     try:
-        create_user(username, email, apikey)
+        create_user(username, emailr, apikey)
     except mysql.connector.errors.IntegrityError as e:
         return "user already exists"
     return str(apikey)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host= '0.0.0.0')
