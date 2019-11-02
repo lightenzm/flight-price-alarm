@@ -24,7 +24,6 @@ def db_connection ():
 mydb = db_connection()
 mycursor = mydb.cursor()
 create_table_statement = "CREATE TABLE IF NOT EXISTS users2 (username varchar(23) NOT NULL,apikey varchar(50) NOT NULL,email varchar(45) NOT NULL,PRIMARY KEY (apikey),UNIQUE KEY email_UNIQUE (email))"
-#mycursor.execute("CREATE TABLE customers (name VARCHAR(255), address VARCHAR(255))")
 
 mycursor.execute(create_table_statement)
 
