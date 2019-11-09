@@ -18,14 +18,14 @@ key = rapid["X-RapidAPI-Key"]
 
 # Browse dates inbound (get req)
 def find_flights():
-    int(round(time.time() * 1000))
+    millis = int(round(time.time() * 1000))
     response = requests.get(
         url,
         headers={'X-RapidAPI-Host': host,
                  'X-RapidAPI-Key': key,
                  }
     )
-    print(find_flights().content)
+    #print(find_flights().content)
     latency = (int(round(time.time() * 1000)) - millis)
     send_latency_cloudwatch(latency)
     return response

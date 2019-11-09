@@ -1,9 +1,9 @@
 {
     "mysql":{
-        "host":"flight-price-alarm-rds.cbroulykvh3i.eu-west-1.rds.amazonaws.com",
+        "host":"project-app-db.cbroulykvh3i.eu-west-1.rds.amazonaws.com",
         "user":"zohar",
         "passwd":"Loklok31",
-        "db":"flight_requests"
+        "db":"flightsAlarm"
     },
     "Rapid-API":{
         "X-RapidAPI-Host":"skyscanner-skyscanner-flight-search-v1.p.rapidapi.com",
