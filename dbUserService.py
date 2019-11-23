@@ -71,6 +71,30 @@ def create_alarm_info(maxprice, apikey, originplace, destinationplace, outboundp
     mydb.commit()
     print(mycursor.rowcount, "record inserted.")
 
+def validatApiKey(apiKey):
+
+    sql = "SELECT apikey FROM flightsAlarm.users where apikey = '{}'".format(apiKey)
+    mycursor.execute(sql)
+    myresult = mycursor.fetchall()
+    return len(myresult) == 1
+
+def getAlarms():
+
+    sql = "SELECT * FROM flightsAlarm.alarm_req"
+    mycursor.execute(sql)
+    myresult = mycursor.fetchall()
+    return myresult
+
+def deleteAlarm(alarmId):
+    sql = "DELETE FROM flightsAlarm.alarm_req WHERE id = '{}'".format(alarmId)
+    mycursor.execute(sql)
+    mydb.commit()
+
+
+
+
+
+
 #create_alarm_info("100", "7546478463120", "SFO-sky", "JFK-sky", "2019-12-01", "2019-12-05")
 # mycursor = mydb.cursor()
 #

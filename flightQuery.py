@@ -1,13 +1,10 @@
 import requests
-import json
 import time
 import boto3
-import mysql.connector
+from dbUserService import *
 
-country = "us"
-url = "https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/browsedates/v1.0/" + country + "/usd/en-us/LHR-sky/SFO-sky/2019-09-09/2019-09-10"
 
-# takes information from configuration file
+# read Rapid-API configurations from the configuration file
 with open('config.json') as json_data_file:
     data = json.load(json_data_file)
 print(data)
@@ -16,9 +13,11 @@ host = rapid["X-RapidAPI-Host"]
 key = rapid["X-RapidAPI-Key"]
 
 
-# Browse dates inbound (get req)
-def find_flights():
-    millis = int(round(time.time() * 1000))
+# Browse flights
+def find_flights(originplace, destinationplace, outboundpartialdate, inboundpartialdate):
+    url = "https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/browsedates/v1.0/US/usd/en-us/{}/{}/{}?inboundpartialdate={}".format(
+        originplace, destinationplace, outboundpartialdate, inboundpartialdate)
+
     response = requests.get(
         url,
         headers={'X-RapidAPI-Host': host,
@@ -26,9 +25,7 @@ def find_flights():
                  }
     )
     #print(find_flights().content)
-    latency = (int(round(time.time() * 1000)) - millis)
-    send_latency_cloudwatch(latency)
-    return response
+    return response.json()
 
 # sends latency metric to aws cloudwatch
 def send_latency_cloudwatch(latency):
@@ -45,3 +42,52 @@ def send_latency_cloudwatch(latency):
     )
     return response
 
+# List airports ('Place Id') by Country name
+def listPlaces(city):
+    url = "https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/autosuggest/v1.0/US/USD/en-us/?query={}".format(city)
+    response = requests.get(
+        url,
+        headers={'X-RapidAPI-Host': host,
+                 'X-RapidAPI-Key': key,
+                 }
+    )
+    return response.json()
+
+#browse flights for user alerts
+def find_flights_and_Alert():
+    print("in find_flights_and_Alert")
+
+    #start time for the latency metric
+    millis = int(round(time.time() * 1000))
+
+    alarms = getAlarms()
+    for alarm in alarms:
+        id = alarm[0]
+        maxPrice= alarm[1]
+        apikey = alarm[2]
+        originplace = alarm[3]
+        destinationplace = alarm[4]
+        outboundpartialdate = alarm[5]
+        inboundpartialdate = alarm[6]
+
+        # use the first airport ID. In the future will loop on all airports
+        originAirportId = listPlaces(originplace)['Places'][0]['PlaceId']
+        destinationAirportId =listPlaces(destinationplace)['Places'][0]['PlaceId']
+        response = find_flights(originAirportId, destinationAirportId, outboundpartialdate, inboundpartialdate)
+        # Waits for the response to be ready...
+        time.sleep(2)
+        minPriceFound = int(response['Quotes'][0]['MinPrice'])
+
+        if (minPriceFound < maxPrice):
+            carrier= response['Carriers'][0]['Name']
+            print("found flight for alarm ID {} for {} USD with carrier {}".format(id, minPriceFound, carrier))
+            print("deleteting alarm {}".format(id))
+            deleteAlarm(id)
+        else:
+            print("no flights under {} USD for alarm ID {}. min price is: {}".format(maxPrice, id, minPriceFound))
+
+    latency = (int(round(time.time() * 1000)) - millis)
+    #Sends latency metric to cloudwatch
+    send_latency_cloudwatch(latency)
+
+#find_flights_and_Alert()

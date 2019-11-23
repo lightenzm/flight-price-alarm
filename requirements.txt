@@ -3,3 +3,5 @@ mysql-connector==2.2.9
 flask
 requests
 hvac
+schedule
+apscheduler
