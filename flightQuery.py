@@ -4,10 +4,10 @@ import boto3
 from dbUserService import *
 
 
+MAX_PRICE = 1000000
 # read Rapid-API configurations from the configuration file
 with open('config.json') as json_data_file:
     data = json.load(json_data_file)
-print(data)
 rapid = data["Rapid-API"]
 host = rapid["X-RapidAPI-Host"]
 key = rapid["X-RapidAPI-Key"]
@@ -71,15 +71,27 @@ def find_flights_and_Alert():
         inboundpartialdate = alarm[6]
 
         # use the first airport ID. In the future will loop on all airports
-        originAirportId = listPlaces(originplace)['Places'][0]['PlaceId']
-        destinationAirportId =listPlaces(destinationplace)['Places'][0]['PlaceId']
-        response = find_flights(originAirportId, destinationAirportId, outboundpartialdate, inboundpartialdate)
-        # Waits for the response to be ready...
-        time.sleep(2)
-        minPriceFound = int(response['Quotes'][0]['MinPrice'])
 
+        minPriceFound = MAX_PRICE
+        carrier = ""
+        originAirports = listPlaces(originplace)['Places']
+        destinationAirports = listPlaces(destinationplace)['Places']
+        print("Looping over all possible routes. Looking for price under {} USD".format(maxPrice))
+        for originAirport in originAirports:
+            for destinationAirport in destinationAirports:
+                response = find_flights(originAirport['PlaceId'], destinationAirport['PlaceId'], outboundpartialdate, inboundpartialdate)
+                # Waits for the response to be ready...
+                #time.sleep(2)
+                try:
+                    if (len(response['Quotes']) > 0):
+                        minPriceForRoute = int(response['Quotes'][0]['MinPrice'])
+                        print("minPrice for route {} => {}, for alarm ID {} is: {} ".format(originAirport['PlaceId'], destinationAirport['PlaceId'], id, str(minPriceForRoute)))
+                        if (minPriceForRoute < minPriceFound):
+                            minPriceFound = minPriceForRoute
+                            carrier = response['Carriers'][0]['Name']
+                except:
+                    print("error parsing data from skyscanner")
         if (minPriceFound < maxPrice):
-            carrier= response['Carriers'][0]['Name']
             print("found flight for alarm ID {} for {} USD with carrier {}".format(id, minPriceFound, carrier))
             print("deleteting alarm {}".format(id))
             deleteAlarm(id)
@@ -90,4 +102,4 @@ def find_flights_and_Alert():
     #Sends latency metric to cloudwatch
     send_latency_cloudwatch(latency)
 
-#find_flights_and_Alert()
+find_flights_and_Alert()
