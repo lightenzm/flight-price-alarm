@@ -76,11 +76,11 @@ def find_flights_and_Alert():
         carrier = ""
         originAirports = listPlaces(originplace)['Places']
         destinationAirports = listPlaces(destinationplace)['Places']
-        print("Looping over all possible routes. Looking for price under {} USD".format(maxPrice))
+        print("Looping over all possible routes(airports? terminals? what is a placeId?!). Looking for price under {} USD".format(maxPrice))
         for originAirport in originAirports:
             for destinationAirport in destinationAirports:
                 response = find_flights(originAirport['PlaceId'], destinationAirport['PlaceId'], outboundpartialdate, inboundpartialdate)
-                # Waits for the response to be ready...
+                # Waits for the response to be ready... (Something is off with the rate limitation of skyscanner)
                 #time.sleep(2)
                 try:
                     if (len(response['Quotes']) > 0):
@@ -92,11 +92,11 @@ def find_flights_and_Alert():
                 except:
                     print("error parsing data from skyscanner")
         if (minPriceFound < maxPrice):
-            print("found flight for alarm ID {} for {} USD with carrier {}".format(id, minPriceFound, carrier))
+            print("*****found flight for alarm ID {} for {} USD with carrier {}*****".format(id, minPriceFound, carrier))
             print("deleteting alarm {}".format(id))
             deleteAlarm(id)
         else:
-            print("no flights under {} USD for alarm ID {}. min price is: {}".format(maxPrice, id, minPriceFound))
+            print("*****no flights under {} USD for alarm ID {}. min price is: {}*****".format(maxPrice, id, minPriceFound))
 
     latency = (int(round(time.time() * 1000)) - millis)
     #Sends latency metric to cloudwatch
