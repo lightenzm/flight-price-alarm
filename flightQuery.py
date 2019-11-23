@@ -76,7 +76,7 @@ def find_flights_and_Alert():
         carrier = ""
         originAirports = listPlaces(originplace)['Places']
         destinationAirports = listPlaces(destinationplace)['Places']
-        print("Looping over all possible routes(airports? terminals? what is a placeId?!). Looking for price under {} USD".format(maxPrice))
+        print("Looping over all possible routes(airports? terminals? what is a placeId?!) from {} to {}. Looking for price under {} USD".format(originplace, destinationplace, maxPrice))
         for originAirport in originAirports:
             for destinationAirport in destinationAirports:
                 response = find_flights(originAirport['PlaceId'], destinationAirport['PlaceId'], outboundpartialdate, inboundpartialdate)
@@ -102,4 +102,4 @@ def find_flights_and_Alert():
     #Sends latency metric to cloudwatch
     send_latency_cloudwatch(latency)
 
-find_flights_and_Alert()
+#find_flights_and_Alert()
