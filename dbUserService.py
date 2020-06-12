@@ -13,7 +13,18 @@ def db_connection ():
     user = mysqldb["user"]
     passwd = mysqldb["passwd"]
     db = mysqldb["db"]
-    #opens a connection to the DB
+    #opens a connection to the mySQL server and creates the DB
+    mydbcon = mysql.connector.connect(
+        host=host,
+        user=user,
+        passwd=passwd
+    )
+
+    cursor = mydbcon.cursor()
+    create_db_statement = "CREATE DATABASE IF NOT EXISTS {}".format(db)
+    cursor.execute(create_db_statement)
+
+    # opens a connection to the DB
     mydb = mysql.connector.connect(
       host = host,
       user = user,

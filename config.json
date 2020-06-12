@@ -1,7 +1,7 @@
 {
     "mysql":{
-        "host":"project-app-db.cbroulykvh3i.eu-west-1.rds.amazonaws.com",
-        "user":"zohar",
+        "host":"localhost",
+        "user":"root",
         "passwd":"Loklok31",
         "db":"flightsAlarm"
     },
